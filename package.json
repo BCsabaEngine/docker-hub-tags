@@ -10,7 +10,8 @@
 		"format:fix": "prettier --write .",
 		"lint:check": "eslint .",
 		"lint:fix": "eslint --fix .",
-		"test": "jest"
+		"test": "jest",
+		"all": "npm run format:fix && npm run lint:fix && npm run test"
 	},
 	"keywords": [],
 	"author": "",

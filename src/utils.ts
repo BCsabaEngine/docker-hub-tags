@@ -16,23 +16,20 @@ export const fetchRetry = async (url: string, retry: number, init?: RequestInit)
 	throw lastError;
 };
 
-const convertSemverLevel = (
-	indicator: string,
-	defaultValue: SemverLevel = 'major'
-): SemverLevel => {
+const convertSemverLevel = (indicator: string): SemverLevel => {
 	switch (indicator) {
 		case '^':
 			return 'minor';
 		case '~':
 			return 'patch';
-		case '$':
+		case '!':
 			return 'evenMajor';
 		default:
-			return defaultValue;
+			return 'major';
 	}
 };
 
-const RegEx: RegExp = /^([$^~]?)v?(\d)(\.(\d))?(\.(\d))?([\d.a-z-]+)*$/i;
+const RegEx: RegExp = /^([!^~]?)v?(\d+)(\.(\d+))?(\.(\d+))?([\d.a-z-]+)*$/i;
 export const parseVersion = (version: string): ParsedVersion | undefined => {
 	const match = version.match(RegEx);
 	if (!match) return;
@@ -54,38 +51,46 @@ export const parseVersionWithLevel = (version: string): ParsedVersionLevel | und
 
 	return {
 		...versionInfo,
-		semverLevel: convertSemverLevel(match[1], match[6] ? 'patch' : match[4] ? 'minor' : 'major')
+		semverLevel: convertSemverLevel(match[1])
 	};
 };
 
-export const isHigherVersion = (from: ParsedVersionLevel, to: ParsedVersion): boolean => {
+export const isHigherVersion = (
+	from: ParsedVersionLevel | ParsedVersion,
+	to: ParsedVersion
+): boolean => {
 	if ((from.postfix || '').toLowerCase() !== (to.postfix || '').toLowerCase()) return false;
 
-	switch (from.semverLevel) {
-		case 'patch':
-			return from.major === to.major && from.minor === to.minor && from.patch < to.patch;
-		case 'minor':
-			return (
-				from.major === to.major &&
-				(from.minor < to.minor || (from.minor === to.minor && from.patch < to.patch))
-			);
-		case 'major':
-		case 'evenMajor':
-			return (
-				(from.major < to.major ||
-					(from.major === to.major &&
-						(from.minor < to.minor || (from.minor === to.minor && from.patch < to.patch)))) &&
-				(from.semverLevel === 'major' || from.major % 2 === to.major % 2)
-			);
-	}
+	if ('semverLevel' in from)
+		switch (from.semverLevel) {
+			case 'patch':
+				return from.major === to.major && from.minor === to.minor && from.patch < to.patch;
+			case 'minor':
+				return (
+					from.major === to.major &&
+					(from.minor < to.minor || (from.minor === to.minor && from.patch < to.patch))
+				);
+			case 'major':
+			case 'evenMajor':
+				return (
+					(from.major < to.major ||
+						(from.major === to.major &&
+							(from.minor < to.minor || (from.minor === to.minor && from.patch < to.patch)))) &&
+					(from.semverLevel === 'major' || from.major % 2 === to.major % 2)
+				);
+		}
 
-	return true;
+	return (
+		from.major < to.major ||
+		(from.major === to.major &&
+			(from.minor < to.minor || (from.minor === to.minor && from.patch < to.patch)))
+	);
 };
 
-export const ParsedVersionToString = (version: ParsedVersion) =>
+export const parsedVersionToString = (version: ParsedVersion) =>
 	`${version.major}.${version.minor}.${version.patch}${version.postfix}`;
-export const ParsedVersionLevelToString = (version: ParsedVersionLevel) =>
-	`${semverLevelToString(version.semverLevel)}.${version.major}.${version.minor}.${version.patch}${
+export const parsedVersionLevelToString = (version: ParsedVersionLevel) =>
+	`${semverLevelToString(version.semverLevel)}${version.major}.${version.minor}.${version.patch}${
 		version.postfix
 	}`;
 export const semverLevelToString = (semverLevel: SemverLevel): string => {
@@ -95,7 +100,7 @@ export const semverLevelToString = (semverLevel: SemverLevel): string => {
 		case 'patch':
 			return '~';
 		case 'evenMajor':
-			return '$';
+			return '!';
 		default:
 			return '';
 	}

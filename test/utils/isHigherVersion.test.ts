@@ -1,8 +1,8 @@
 import { describe, expect, test } from '@jest/globals';
 
-import { isHigherVersion, parseVersion, parseVersionWithLevel } from '../src/utils';
+import { isHigherVersion, parseVersion, parseVersionWithLevel } from '../../src/utils';
 
-const tests: { from: string; to: string; result: boolean }[] = [
+const testsWithLevel: { from: string; to: string; result: boolean }[] = [
 	{ from: '2.0.0', to: '2.0.0', result: false },
 	{ from: '2.0.0', to: '1.0.0', result: false },
 	{ from: '2.0.0', to: '1.2.0', result: false },
@@ -23,37 +23,57 @@ const tests: { from: string; to: string; result: boolean }[] = [
 	{ from: '~1.0.0', to: '1.2.0', result: false },
 	{ from: '~1.0.0', to: '2.0.0', result: false },
 	{ from: '1.2.3', to: '1.2.4', result: true },
-	{ from: '1.2.3', to: '1.3.0', result: false },
-	{ from: '1.2.3', to: '2.0.0', result: false },
+	{ from: '1.2.3', to: '1.3.0', result: true },
+	{ from: '1.2.3', to: '2.0.0', result: true },
 
 	{ from: '^1.0.0', to: '1.0.1', result: true },
 	{ from: '^1.0.0', to: '1.1.0', result: true },
 	{ from: '^1.0.0', to: '2.1.0', result: false },
 	{ from: '1.0', to: '1.0.1', result: true },
 	{ from: '1.0', to: '1.1.0', result: true },
-	{ from: '1.0', to: '2.1.0', result: false },
+	{ from: '1.0', to: '2.1.0', result: true },
 
 	{ from: '1', to: '1.0.1', result: true },
 	{ from: '1', to: '1.1.0', result: true },
 	{ from: '1', to: '2.0.0', result: true },
 
-	{ from: '$1.0.0', to: '2.0.0', result: false },
-	{ from: '$1.0.0', to: '2.0.1', result: false },
-	{ from: '$1.0.0', to: '2.1.0', result: false },
-	{ from: '$1.0.0', to: '3.0.0', result: true },
-	{ from: '$1.0.0', to: '3.0.1', result: true },
-	{ from: '$1.0.0', to: '3.1.0', result: true },
-	{ from: '$2.0.0', to: '3.0.0', result: false },
-	{ from: '$2.0.0', to: '3.0.1', result: false },
-	{ from: '$2.0.0', to: '3.1.0', result: false },
-	{ from: '$2.0.0', to: '4.0.0', result: true },
-	{ from: '$2.0.0', to: '4.0.1', result: true },
-	{ from: '$2.0.0', to: '4.1.0', result: true }
+	{ from: '!1.0.0', to: '2.0.0', result: false },
+	{ from: '!1.0.0', to: '2.0.1', result: false },
+	{ from: '!1.0.0', to: '2.1.0', result: false },
+	{ from: '!1.0.0', to: '3.0.0', result: true },
+	{ from: '!1.0.0', to: '3.0.1', result: true },
+	{ from: '!1.0.0', to: '3.1.0', result: true },
+	{ from: '!2.0.0', to: '3.0.0', result: false },
+	{ from: '!2.0.0', to: '3.0.1', result: false },
+	{ from: '!2.0.0', to: '3.1.0', result: false },
+	{ from: '!2.0.0', to: '4.0.0', result: true },
+	{ from: '!2.0.0', to: '4.0.1', result: true },
+	{ from: '!2.0.0', to: '4.1.0', result: true }
+];
+
+const testsWithoutLevel: { from: string; to: string; result: boolean }[] = [
+	{ from: '1.0.0', to: '1.0.0', result: false },
+	{ from: '1.0.0', to: '0.1.0', result: false },
+	{ from: '1.0.0', to: '0.1.1', result: false },
+	{ from: '1.0.0', to: '0.0.1', result: false },
+
+	{ from: '1.0.0', to: '1.0.1', result: true },
+	{ from: '1.0.0', to: '1.1.0', result: true },
+	{ from: '1.0.0', to: '2.0.0', result: true }
 ];
 
 describe('isHigherVersion', () => {
-	for (const t of tests) {
+	for (const t of testsWithLevel) {
 		const fromVersion = parseVersionWithLevel(t.from);
+		const toVersion = parseVersion(t.to);
+
+		if (fromVersion && toVersion)
+			test(`${t.from} > ${t.to}`, () =>
+				expect(isHigherVersion(fromVersion, toVersion)).toBe(t.result));
+	}
+
+	for (const t of testsWithoutLevel) {
+		const fromVersion = parseVersion(t.from);
 		const toVersion = parseVersion(t.to);
 
 		if (fromVersion && toVersion)

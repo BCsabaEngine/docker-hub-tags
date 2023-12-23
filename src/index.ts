@@ -1,5 +1,3 @@
-import { readFileSync, writeFileSync } from 'node:fs';
-
 import {
 	defaultDockerHubTagsFilter,
 	defaultDockerHubTagsOptions,
@@ -8,9 +6,12 @@ import {
 	DockerHubTagsOptions,
 	HubResponse,
 	HubResult,
-	ParsedVersionLevel
+	ParsedVersion,
+	ParsedVersionLevel,
+	Tag,
+	TagDetailed
 } from './types';
-import { fetchRetry, parseVersionWithLevel } from './utils';
+import { fetchRetry, isHigherVersion, parseVersion, parseVersionWithLevel } from './utils';
 
 export const OFFICIALIMAGES_NAMESPACE = 'library';
 export class DockerHubTags {
@@ -83,21 +84,40 @@ export class DockerHubTags {
 			)
 		);
 
-	public static createFrom = (filename: string) =>
-		new DockerHubTags(JSON.parse(readFileSync(filename).toString()));
+	public static createFromJson = (json: string) => new DockerHubTags(JSON.parse(json));
+	public exportToJson = (): string => JSON.stringify(this.tags, undefined, 2);
 
-	public exportTo = (filename: string) =>
-		writeFileSync(filename, JSON.stringify(this.tags, undefined, 2));
+	public getAllTags = (): Tag[] => this.tags;
+	public getLatest = (): TagDetailed | undefined => this.getTag('latest');
+	public getTag = (tag: string): TagDetailed | undefined => {
+		const tagFound: Tag | undefined = this.tags.find((t) => tag.localeCompare(t.name) === 0);
+		if (!tagFound) return;
 
-	public getAllTags = () => this.tags;
+		return {
+			...tagFound,
+			sameTags: this.tags.filter((t) => t.digest === tagFound.digest).map((t) => t.name)
+		};
+	};
 
-	public getLatest = () => {};
-
-	public getRecent = (version: string | ParsedVersionLevel) => {
-		const parsedVersion: ParsedVersionLevel | undefined =
+	public getRecent = (version: string | ParsedVersionLevel): TagDetailed | undefined => {
+		const currentVersion: ParsedVersionLevel | undefined =
 			typeof version === 'string' ? parseVersionWithLevel(version) : version;
-		if (!parsedVersion) throw new DockerHubTagsError(`Cannot parse ${version}`);
+		if (!currentVersion) throw new DockerHubTagsError(`Cannot parse ${version}`);
 
-		//parsedVersion.
+		let resultTag: { name: string; version: ParsedVersion } | undefined;
+		for (const t of this.tags) {
+			const targetVersion = parseVersion(t.name);
+			if (
+				targetVersion &&
+				isHigherVersion(currentVersion, targetVersion) &&
+				(!resultTag || isHigherVersion(resultTag.version, targetVersion))
+			)
+				resultTag = {
+					name: t.name,
+					version: targetVersion
+				};
+		}
+
+		return resultTag ? this.getTag(resultTag.name) : undefined;
 	};
 }

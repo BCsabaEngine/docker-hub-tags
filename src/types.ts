@@ -36,6 +36,10 @@ export type ParsedVersion = {
 };
 export type ParsedVersionLevel = ParsedVersion & { semverLevel: SemverLevel };
 
+//TagInfo
+export type Tag = HubResult;
+export type TagDetailed = HubResult & { sameTags: string[] };
+
 //Hub response
 export const HubImage = z.object({
 	os: z.string(),
@@ -63,5 +67,4 @@ export const HubResponse = z.object({
 	next: z.string().nullable(),
 	results: z.array(HubResult)
 });
-
 export type HubResponse = z.infer<typeof HubResponse>;
