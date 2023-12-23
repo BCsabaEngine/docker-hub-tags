@@ -18,7 +18,7 @@ const tests: Record<string, Partial<ParsedVersionLevel>> = {
 	$v1: { major: 1, minor: 0, patch: 0, postfix: undefined, semverLevel: 'evenMajor' }
 };
 
-describe('parseVersion', () => {
+describe('parseVersionWithLevel', () => {
 	for (const [input, output] of Object.entries(tests))
 		test(input, () => expect(parseVersionWithLevel(input)).toMatchObject(output));
 });
