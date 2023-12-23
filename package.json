@@ -2,20 +2,43 @@
 	"name": "docker-hub-tags",
 	"version": "1.0.0",
 	"description": "",
-	"main": "dist/index.js",
+	"author": "BCsabaEngine <csaba@balazs-magyar.hu>",
+	"license": "MIT",
+	"main": "./dist/index.js",
+	"types": "./dist/index.d.ts",
+	"engines": {
+		"node": ">=20",
+		"npm": ">=10"
+	},
+	"files": [
+		"dist/**/*.js",
+		"dist/**/*.d.ts"
+	],
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/BCsabaEngine/docker-hub-tags.git"
+	},
+	"bugs": {
+		"url": "https://github.com/BCsabaEngine/docker-hub-tags/issues"
+	},
+	"homepage": "https://github.com/BCsabaEngine/docker-hub-tags",
+	"keywords": [
+		"roco",
+		"z21"
+	],
 	"scripts": {
 		"dev": "nodemon ./example/simpleGet.ts",
-		"build": "tsc",
+		"clean": "tsc --build --clean",
+		"build": "tsc --build --clean && tsc --build --force",
 		"format:check": "prettier --check .",
 		"format:fix": "prettier --write .",
 		"lint:check": "eslint .",
 		"lint:fix": "eslint --fix .",
 		"test": "jest",
-		"all": "npm run format:fix && npm run lint:fix && npm run test"
+		"all": "npm run format:fix && npm run lint:fix && npm run test",
+		"npm-publish-patch": "npm run build && npm version patch && npm publish && npm run clean && git push",
+		"npm-publish-minor": "npm run build && npm version minor && npm publish && npm run clean && git push"
 	},
-	"keywords": [],
-	"author": "",
-	"license": "ISC",
 	"devDependencies": {
 		"@types/jest": "^29.5.11",
 		"@types/node": "^20.10.5",
