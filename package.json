@@ -23,8 +23,10 @@
 	},
 	"homepage": "https://github.com/BCsabaEngine/docker-hub-tags",
 	"keywords": [
-		"roco",
-		"z21"
+		"nodejs",
+		"typescript",
+		"versions",
+		"dockerhub"
 	],
 	"scripts": {
 		"dev": "nodemon ./example/simpleGet.ts",
