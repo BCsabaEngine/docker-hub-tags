@@ -1,7 +1,16 @@
 import { readFileSync, writeFileSync } from 'node:fs';
 
-import { defaultDockerHubTagsOptions, DockerHubTagsOptions, HubResponse, HubResult } from './types';
-import { fetchRetry } from './utils';
+import {
+	defaultDockerHubTagsFilter,
+	defaultDockerHubTagsOptions,
+	DockerHubTagsError,
+	DockerHubTagsFilter,
+	DockerHubTagsOptions,
+	HubResponse,
+	HubResult,
+	ParsedVersionLevel
+} from './types';
+import { fetchRetry, parseVersionWithLevel } from './utils';
 
 export const OFFICIALIMAGES_NAMESPACE = 'library';
 export class DockerHubTags {
@@ -14,6 +23,7 @@ export class DockerHubTags {
 	private static async fetch(
 		namespace: string,
 		repository: string,
+		filter: DockerHubTagsFilter,
 		options: DockerHubTagsOptions
 	): Promise<HubResult[]> {
 		const PAGESIZE = 100;
@@ -43,7 +53,10 @@ export class DockerHubTags {
 						(image) =>
 							image.status === 'active' &&
 							image.os !== 'unknown' &&
-							image.architecture !== 'unknown'
+							image.architecture !== 'unknown' &&
+							(!filter.os || image.os === filter.os) &&
+							(!filter.architecture || image.architecture === filter.architecture) &&
+							(!filter.variant || image.variant === filter.variant)
 					);
 					if (tag.images.length > 0) tags.push(tag);
 					if (options.limit > 0 && tags.length >= options.limit) break tagLimit;
@@ -58,12 +71,14 @@ export class DockerHubTags {
 	public static init = async (
 		namespace: string,
 		repository: string,
+		filter: Partial<DockerHubTagsFilter> = defaultDockerHubTagsFilter,
 		options: Partial<DockerHubTagsOptions> = defaultDockerHubTagsOptions
 	) =>
 		new DockerHubTags(
 			await DockerHubTags.fetch(
 				namespace,
 				repository,
+				Object.assign(defaultDockerHubTagsFilter, filter),
 				Object.assign(defaultDockerHubTagsOptions, options)
 			)
 		);
@@ -71,7 +86,18 @@ export class DockerHubTags {
 	public static createFrom = (filename: string) =>
 		new DockerHubTags(JSON.parse(readFileSync(filename).toString()));
 
-	public exportTo = (filename: string) => writeFileSync(filename, JSON.stringify(this.tags));
+	public exportTo = (filename: string) =>
+		writeFileSync(filename, JSON.stringify(this.tags, undefined, 2));
 
 	public getAllTags = () => this.tags;
+
+	public getLatest = () => {};
+
+	public getRecent = (version: string | ParsedVersionLevel) => {
+		const parsedVersion: ParsedVersionLevel | undefined =
+			typeof version === 'string' ? parseVersionWithLevel(version) : version;
+		if (!parsedVersion) throw new DockerHubTagsError(`Cannot parse ${version}`);
+
+		//parsedVersion.
+	};
 }

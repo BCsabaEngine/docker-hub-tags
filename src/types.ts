@@ -1,6 +1,13 @@
 import { z } from 'zod';
 
 //Initialization options
+export type DockerHubTagsFilter = {
+	os?: string;
+	architecture?: string;
+	variant?: string;
+};
+export const defaultDockerHubTagsFilter: DockerHubTagsFilter = {};
+
 export type DockerHubTagsOptions = {
 	limit: number;
 	retry: number;
@@ -9,6 +16,25 @@ export const defaultDockerHubTagsOptions: DockerHubTagsOptions = {
 	limit: 1000,
 	retry: 10
 };
+
+//Error
+export class DockerHubTagsError extends Error {
+	constructor(message: string) {
+		super(message);
+		this.name = 'DockerHubTagsError';
+	}
+}
+
+//Version
+export type SemverLevel = 'patch' | 'minor' | 'major' | 'evenMajor';
+
+export type ParsedVersion = {
+	major: number;
+	minor: number;
+	patch: number;
+	postfix: string;
+};
+export type ParsedVersionLevel = ParsedVersion & { semverLevel: SemverLevel };
 
 //Hub response
 export const HubImage = z.object({
