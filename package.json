@@ -1,7 +1,7 @@
 {
 	"name": "docker-hub-tags",
 	"version": "1.0.0",
-	"description": "",
+	"description": "NodeJS lib, with which you can easily find the latest version of Docker Hub images",
 	"author": "BCsabaEngine <csaba@balazs-magyar.hu>",
 	"license": "MIT",
 	"main": "./dist/index.js",

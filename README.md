@@ -1,38 +1,23 @@
-# create-svelte
+# Docker-Hub-TAGS
 
-Everything you need to build a Svelte project, powered by [`create-svelte`](https://github.com/sveltejs/kit/tree/master/packages/create-svelte).
+NodeJS lib, with which you can easily find the latest version of Docker Hub images.
 
-## Creating a project
+I also publish my own applications in docker images and use [Docker HUB](https://hub.docker.com/) for this. Several times I ran into the fact that many or very many images are published, it is difficult to find if there is a more recent version. And the names of the images and tags are also quite varied, it is difficult to navigate them.
 
-If you're seeing this, you've probably already done this step. Congrats!
+If you want to access the list of images of a Docker Repository from a NodeJS application and search it with semantic versioning, then you have found the solution: npm, TypeScript, well tested!
 
-```bash
-# create a new project in the current directory
-npm create svelte@latest
-
-# create a new project in my-app
-npm create svelte@latest my-app
-```
-
-## Developing
-
-Once you've created a project and installed dependencies with `npm install` (or `pnpm install` or `yarn`), start a development server:
+## Install
 
 ```bash
-npm run dev
-
-# or start the server and open the app in a new browser tab
-npm run dev -- --open
+# install package from npmjs
+npm i docker-hub-tags
 ```
 
-## Building
+## Usage
 
-To create a production version of your app:
+The very first step is to download the Docker Hub repository information. You can initialize the DockerHubTags class with this. After that, you can perform one or more actions or searches without internet traffic.
 
-```bash
-npm run build
-```
+- Access the repositories belonging to the (community) user namespace (eg: adobeapiplatform/apigateway, openebs/mayastor-casperf, etc.)
+- Access the Official Images (eg: Node, Nginx, Ubuntu, Python, Redis, Mysql, etc.)
 
-You can preview the production build with `npm run preview`.
-
-> To deploy your app, you may need to install an [adapter](https://kit.svelte.dev/docs/adapters) for your target environment.
+> Explore the [examples](https://github.com/BCsabaEngine/docker-hub-tags/tree/master/example) folder for more examples.
