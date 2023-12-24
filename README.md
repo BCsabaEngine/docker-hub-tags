@@ -1,4 +1,9 @@
-# Docker-Hub-TAGS
+![](https://flat.badgen.net/badge/use/TypeScript/blue)
+![](https://flat.badgen.net/badge/use/npm/orange)
+![](https://flat.badgen.net/badge/use/jest/green)
+![](https://flat.badgen.net/badge/use/lint/purple)
+
+# Docker-Hub-Tags
 
 NodeJS lib, with which you can easily find the latest version of Docker Hub images.
 
@@ -34,15 +39,15 @@ You have the option to filter the images if you are only interested in the image
 
 ```bash
 const dht = await DockerHubTags.init(
-	OFFICIALIMAGES_NAMESPACE,
-	'node',
+    OFFICIALIMAGES_NAMESPACE,
+    'node',
     # retrieve linux/arm64 images only
     {
         os: 'linux',
         architecture: 'arm64'
     },
     # fetch 300 taginfos only
-	{ limit: 300 }
+    { limit: 300 }
 );
 ```
 
@@ -52,10 +57,10 @@ You can easily save the data you have already downloaded so that you can load it
 
 ```bash
 const dht = await DockerHubTags.init(OFFICIALIMAGES_NAMESPACE, 'node');
-const dataForSave = dht.exportToJson();
+const savedData = dht.exportToJson();
 
 # Later...
-const dhtFromFile = DockerHubTags.createFromJson(dataForSave);
+const dhtFromFile = DockerHubTags.createFromJson(savedData);
 ```
 
 ### Query
