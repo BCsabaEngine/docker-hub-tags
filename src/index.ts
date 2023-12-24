@@ -49,10 +49,11 @@ export class DockerHubTags {
 			const response = HubResponse.parse(json);
 
 			for (const tag of response.results) {
-				if (tag.content_type === 'image' && tag.tag_status === 'active') {
+				if (tag.content_type === 'image' && tag.tag_status === 'active' && tag.digest) {
 					tag.images = tag.images.filter(
 						(image) =>
 							image.status === 'active' &&
+							image.digest &&
 							image.os !== 'unknown' &&
 							image.architecture !== 'unknown' &&
 							(!filter.os || image.os === filter.os) &&

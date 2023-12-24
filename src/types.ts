@@ -47,7 +47,7 @@ export const HubImage = z.object({
 	variant: z.string().nullable(),
 	size: z.number(),
 	status: z.string(),
-	digest: z.string()
+	digest: z.string().default('') //not exists for inactive items
 });
 export type HubImage = z.infer<typeof HubImage>;
 
@@ -57,7 +57,7 @@ export const HubResult = z.object({
 	content_type: z.string(),
 	full_size: z.number(),
 	last_updated: z.date({ coerce: true }),
-	digest: z.string(),
+	digest: z.string().default(''), //not exists for inactive items
 	images: z.array(HubImage)
 });
 export type HubResult = z.infer<typeof HubResult>;
